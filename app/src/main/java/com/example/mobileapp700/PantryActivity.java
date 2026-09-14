@@ -26,7 +26,11 @@ public class PantryActivity extends AppCompatActivity {
     ListView listPantry;
 
     ArrayList<String> pantryItems;
+    ArrayList<Integer> pantryIds;
+
     ArrayAdapter<String> adapter;
+
+    DatabaseHelper databaseHelper;
 
     int selectedPosition = -1;
 
@@ -49,8 +53,12 @@ public class PantryActivity extends AppCompatActivity {
         // This gets the pantry list
         listPantry = findViewById(R.id.listPantry);
 
-        // This creates the pantry list
-        pantryItems = new ArrayList<>();
+        // This connects to the database
+        databaseHelper = new DatabaseHelper(this);
+
+        // This loads the pantry items and their IDs
+        pantryItems = databaseHelper.getPantryItems();
+        pantryIds = databaseHelper.getPantryIds();
 
         adapter = new ArrayAdapter<>(
                 this,
@@ -80,6 +88,8 @@ public class PantryActivity extends AppCompatActivity {
 
                 } else {
 
+                    double quantityNumber = Double.parseDouble(quantity);
+
                     String item = ingredient + " - " + quantity + " " + unit;
 
                     if (!expiryDate.isEmpty()) {
@@ -89,27 +99,70 @@ public class PantryActivity extends AppCompatActivity {
                     // This updates an existing item
                     if (selectedPosition != -1) {
 
-                        pantryItems.set(selectedPosition, item);
+                        int itemId = pantryIds.get(selectedPosition);
 
-                        selectedPosition = -1;
-                        btnAdd.setText("Add Item");
+                        boolean updated = databaseHelper.updatePantryItem(
+                                itemId,
+                                ingredient,
+                                quantityNumber,
+                                unit,
+                                expiryDate
+                        );
 
-                        Toast.makeText(
-                                PantryActivity.this,
-                                "Item updated",
-                                Toast.LENGTH_SHORT
-                        ).show();
+                        if (updated) {
+
+                            pantryItems.set(selectedPosition, item);
+
+                            selectedPosition = -1;
+                            btnAdd.setText("Add Item");
+
+                            Toast.makeText(
+                                    PantryActivity.this,
+                                    "Item updated",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+
+                        } else {
+
+                            Toast.makeText(
+                                    PantryActivity.this,
+                                    "Item could not be updated",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
 
                     } else {
 
-                        // This adds a new item
-                        pantryItems.add(item);
+                        // This saves the item to the database
+                        boolean saved = databaseHelper.addPantryItem(
+                                ingredient,
+                                quantityNumber,
+                                unit,
+                                expiryDate
+                        );
 
-                        Toast.makeText(
-                                PantryActivity.this,
-                                "Item added",
-                                Toast.LENGTH_SHORT
-                        ).show();
+                        if (saved) {
+
+                            pantryItems = databaseHelper.getPantryItems();
+                            pantryIds = databaseHelper.getPantryIds();
+
+                            adapter.clear();
+                            adapter.addAll(pantryItems);
+
+                            Toast.makeText(
+                                    PantryActivity.this,
+                                    "Item added",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+
+                        } else {
+
+                            Toast.makeText(
+                                    PantryActivity.this,
+                                    "Item could not be added",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
                     }
 
                     adapter.notifyDataSetChanged();
@@ -188,14 +241,32 @@ public class PantryActivity extends AppCompatActivity {
                                 "Yes",
                                 (deleteDialog, deleteWhich) -> {
 
-                                    pantryItems.remove(position);
-                                    adapter.notifyDataSetChanged();
+                                    int itemId = pantryIds.get(position);
 
-                                    Toast.makeText(
-                                            PantryActivity.this,
-                                            "Item deleted",
-                                            Toast.LENGTH_SHORT
-                                    ).show();
+                                    boolean deleted =
+                                            databaseHelper.deletePantryItem(itemId);
+
+                                    if (deleted) {
+
+                                        pantryItems.remove(position);
+                                        pantryIds.remove(position);
+
+                                        adapter.notifyDataSetChanged();
+
+                                        Toast.makeText(
+                                                PantryActivity.this,
+                                                "Item deleted",
+                                                Toast.LENGTH_SHORT
+                                        ).show();
+
+                                    } else {
+
+                                        Toast.makeText(
+                                                PantryActivity.this,
+                                                "Item could not be deleted",
+                                                Toast.LENGTH_SHORT
+                                        ).show();
+                                    }
                                 }
                         );
 

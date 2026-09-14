@@ -10,11 +10,8 @@ import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    // This sets the database name
     private static final String DATABASE_NAME = "SmartPantry.db";
-
-    // This sets the database version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -30,19 +27,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "quantity REAL, " +
                 "unit TEXT, " +
                 "expiry_date TEXT)");
+
+        createRecipeTables(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        // This removes the old pantry table
-        db.execSQL("DROP TABLE IF EXISTS pantry");
+        // This creates the recipe tables for version 2
+        if (oldVersion < 2) {
+            createRecipeTables(db);
+        }
 
-        // This creates the pantry table again
-        onCreate(db);
+        // This resets only the recipe tables for version 3
+        if (oldVersion < 3) {
+
+            db.execSQL("DROP TABLE IF EXISTS recipe_ingredients");
+            db.execSQL("DROP TABLE IF EXISTS recipes");
+
+            createRecipeTables(db);
+        }
     }
 
-    // This adds an item to the pantry table
+    // This creates the recipe tables
+    private void createRecipeTables(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE recipes (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "name TEXT, " +
+                "steps TEXT)");
+
+        db.execSQL("CREATE TABLE recipe_ingredients (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "recipe_id INTEGER, " +
+                "ingredient TEXT, " +
+                "quantity REAL, " +
+                "unit TEXT)");
+    }
+
+    // This adds an item to the pantry
     public boolean addPantryItem(
             String ingredient,
             double quantity,
@@ -59,12 +82,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("unit", unit);
         values.put("expiry_date", expiryDate);
 
-        long result = db.insert("pantry", null, values);
+        long result = db.insert(
+                "pantry",
+                null,
+                values
+        );
 
         return result != -1;
     }
 
-    // This gets all the pantry items
+    // This gets all pantry items
     public ArrayList<String> getPantryItems() {
 
         ArrayList<String> pantryItems = new ArrayList<>();
@@ -83,10 +110,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String unit = cursor.getString(3);
             String expiryDate = cursor.getString(4);
 
-            String item = ingredient + " - " + quantity + " " + unit;
+            String item =
+                    ingredient + " - " +
+                            quantity + " " +
+                            unit;
 
             if (expiryDate != null && !expiryDate.isEmpty()) {
-                item = item + " - Expiry: " + expiryDate;
+
+                item = item +
+                        " - Expiry: " +
+                        expiryDate;
             }
 
             pantryItems.add(item);

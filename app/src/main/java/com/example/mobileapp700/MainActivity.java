@@ -16,17 +16,30 @@ public class MainActivity extends AppCompatActivity {
         // This displays the main screen
         setContentView(R.layout.activity_main);
 
+        // This adds the starting recipes
+        RecipeDatabase recipeDatabase =
+                new RecipeDatabase(this);
+
+        recipeDatabase.seedRecipes();
+
         // This gets the pantry button
-        Button btnPantry = findViewById(R.id.btnPantry);
+        Button btnPantry =
+                findViewById(R.id.btnPantry);
 
         // This button opens the pantry screen
-        btnPantry.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        btnPantry.setOnClickListener(
+                new View.OnClickListener() {
 
-                Intent intent = new Intent(MainActivity.this, PantryActivity.class);
-                startActivity(intent);
-            }
-        });
+                    @Override
+                    public void onClick(View view) {
+
+                        Intent intent = new Intent(
+                                MainActivity.this,
+                                PantryActivity.class
+                        );
+
+                        startActivity(intent);
+                    }
+                });
     }
 }

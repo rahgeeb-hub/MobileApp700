@@ -22,9 +22,12 @@ public class MainActivity extends AppCompatActivity {
 
         recipeDatabase.seedRecipes();
 
-        // This gets the pantry button
+        // This gets the buttons
         Button btnPantry =
                 findViewById(R.id.btnPantry);
+
+        Button btnRecipes =
+                findViewById(R.id.btnRecipes);
 
         // This button opens the pantry screen
         btnPantry.setOnClickListener(
@@ -36,6 +39,22 @@ public class MainActivity extends AppCompatActivity {
                         Intent intent = new Intent(
                                 MainActivity.this,
                                 PantryActivity.class
+                        );
+
+                        startActivity(intent);
+                    }
+                });
+
+        // This button opens the suggested recipes screen
+        btnRecipes.setOnClickListener(
+                new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
+
+                        Intent intent = new Intent(
+                                MainActivity.this,
+                                SuggestedRecipesActivity.class
                         );
 
                         startActivity(intent);

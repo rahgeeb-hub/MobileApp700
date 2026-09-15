@@ -257,4 +257,59 @@ public class RecipeDatabase {
                 values
         );
     }
+    // This gets the ingredients for a recipe
+    public String getRecipeIngredients(String recipeName) {
+
+        SQLiteDatabase db =
+                databaseHelper.getReadableDatabase();
+
+        String ingredients = "";
+
+        Cursor cursor = db.rawQuery(
+                "SELECT ingredient, quantity, unit " +
+                        "FROM recipe_ingredients " +
+                        "WHERE recipe_id = (" +
+                        "SELECT id FROM recipes WHERE name = ?)",
+                new String[]{recipeName}
+        );
+
+        while (cursor.moveToNext()) {
+
+            String ingredient = cursor.getString(0);
+            double quantity = cursor.getDouble(1);
+            String unit = cursor.getString(2);
+
+            ingredients = ingredients +
+                    ingredient + " - " +
+                    quantity + " " +
+                    unit + "\n";
+        }
+
+        cursor.close();
+
+        return ingredients;
+    }
+
+
+    // This gets the preparation steps for a recipe
+    public String getRecipeSteps(String recipeName) {
+
+        SQLiteDatabase db =
+                databaseHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT steps FROM recipes WHERE name = ?",
+                new String[]{recipeName}
+        );
+
+        String steps = "";
+
+        if (cursor.moveToFirst()) {
+            steps = cursor.getString(0);
+        }
+
+        cursor.close();
+
+        return steps;
+    }
 }

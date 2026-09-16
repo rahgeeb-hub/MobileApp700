@@ -44,7 +44,7 @@
         android:id="@+id/txtExpiryDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Expiry date (optional)" />
+        android:hint="Expiry date yyyy-MM-dd (optional)" />
 
     <!-- This button will add an item to the pantry -->
     <Button

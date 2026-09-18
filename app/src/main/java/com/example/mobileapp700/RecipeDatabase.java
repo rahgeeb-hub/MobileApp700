@@ -257,6 +257,7 @@ public class RecipeDatabase {
                 values
         );
     }
+
     // This gets the ingredients for a recipe
     public String getRecipeIngredients(String recipeName) {
 
@@ -279,9 +280,18 @@ public class RecipeDatabase {
             double quantity = cursor.getDouble(1);
             String unit = cursor.getString(2);
 
+            // This removes .0 from whole numbers
+            String displayQuantity;
+
+            if (quantity == (int) quantity) {
+                displayQuantity = String.valueOf((int) quantity);
+            } else {
+                displayQuantity = String.valueOf(quantity);
+            }
+
             ingredients = ingredients +
                     ingredient + " - " +
-                    quantity + " " +
+                    displayQuantity + " " +
                     unit + "\n";
         }
 
@@ -289,7 +299,6 @@ public class RecipeDatabase {
 
         return ingredients;
     }
-
 
     // This gets the preparation steps for a recipe
     public String getRecipeSteps(String recipeName) {

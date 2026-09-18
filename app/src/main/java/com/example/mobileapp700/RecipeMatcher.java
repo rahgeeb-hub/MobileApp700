@@ -64,10 +64,13 @@ public class RecipeMatcher {
                     double pantryQuantity = pantry.getDouble(1);
                     String pantryUnit = pantry.getString(2);
 
-                    // This checks if the ingredient names match
+                    // This checks the ingredient name and unit
                     if (sameIngredient(
                             pantryIngredient,
-                            neededIngredient)) {
+                            neededIngredient) &&
+                            sameUnitType(
+                                    pantryUnit,
+                                    neededUnit)) {
 
                         double pantryAmount =
                                 convertQuantity(
@@ -166,5 +169,38 @@ public class RecipeMatcher {
         }
 
         return quantity;
+    }
+
+    // This checks if the units can be compared
+    private boolean sameUnitType(
+            String first,
+            String second
+    ) {
+
+        first = first.toLowerCase().trim();
+        second = second.toLowerCase().trim();
+
+        // This checks weight units
+        if ((first.equals("g") || first.equals("kg")) &&
+                (second.equals("g") || second.equals("kg"))) {
+
+            return true;
+        }
+
+        // This checks liquid units
+        if ((first.equals("ml") ||
+                first.equals("l") ||
+                first.equals("litre") ||
+                first.equals("litres")) &&
+                (second.equals("ml") ||
+                        second.equals("l") ||
+                        second.equals("litre") ||
+                        second.equals("litres"))) {
+
+            return true;
+        }
+
+        // Other units must be the same
+        return first.equals(second);
     }
 }

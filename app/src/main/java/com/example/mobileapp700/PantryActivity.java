@@ -105,7 +105,12 @@ public class PantryActivity extends AppCompatActivity {
                     }
                 }
 
-                String item = ingredient + " - " + quantity + " " + unit;
+                // This makes the quantity easier to read
+                String displayQuantity =
+                        formatQuantity(quantityNumber);
+
+                String item = ingredient + " - " +
+                        displayQuantity + " " + unit;
 
                 if (!expiryDate.isEmpty()) {
                     item += " - Expiry: " + expiryDate;
@@ -246,5 +251,15 @@ public class PantryActivity extends AppCompatActivity {
                         .show();
             }
         });
+    }
+
+    // This removes .0 from whole numbers
+    private String formatQuantity(double quantity) {
+
+        if (quantity == (int) quantity) {
+            return String.valueOf((int) quantity);
+        }
+
+        return String.valueOf(quantity);
     }
 }

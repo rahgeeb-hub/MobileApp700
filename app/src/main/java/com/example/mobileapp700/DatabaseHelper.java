@@ -110,9 +110,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String unit = cursor.getString(3);
             String expiryDate = cursor.getString(4);
 
+            // This removes .0 from whole numbers
+            String displayQuantity;
+
+            if (quantity == (int) quantity) {
+                displayQuantity = String.valueOf((int) quantity);
+            } else {
+                displayQuantity = String.valueOf(quantity);
+            }
+
             String item =
                     ingredient + " - " +
-                            quantity + " " +
+                            displayQuantity + " " +
                             unit;
 
             if (expiryDate != null && !expiryDate.isEmpty()) {

@@ -17,7 +17,7 @@ public class PantryActivity extends AppCompatActivity {
 
     ArrayList<String> pantryItems;
     ArrayList<Integer> pantryIds;
-    ArrayAdapter<String> adapter;
+    PantryAdapter adapter;
 
     DatabaseHelper databaseHelper;
     int selectedPosition = -1;
@@ -44,9 +44,8 @@ public class PantryActivity extends AppCompatActivity {
         pantryItems = databaseHelper.getPantryItems();
         pantryIds = databaseHelper.getPantryIds();
 
-        adapter = new ArrayAdapter<>(
+        adapter = new PantryAdapter(
                 this,
-                android.R.layout.simple_list_item_1,
                 pantryItems
         );
 
